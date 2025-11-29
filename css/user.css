@@ -1,0 +1,8 @@
+@font-face{
+    font-family: 'SiYuanSongTi';
+    src: url('../fonts/SourceHanSerifCN.otf');   
+}
+​
+body {
+    font-family: 'SiYuanSongTi';
+}
