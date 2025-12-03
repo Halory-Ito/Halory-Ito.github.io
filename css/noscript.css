@@ -46,3 +46,9 @@ body {
   width: 100%;
   z-index: 50;
 }
+.markdown-body p,
+.prose p,
+.post-body > p {
+  text-indent: 2em;
+  margin: 0em;
+}

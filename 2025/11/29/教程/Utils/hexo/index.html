@@ -140,7 +140,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">编写格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.1.</span> <span class="nav-text">type 属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.2.</span> <span class="nav-text">categories 和 tags</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">Hexo 插件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.1.</span> <span class="nav-text">hexo-image-link</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">编写格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#type-%E5%B1%9E%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">type 属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#categories-%E5%92%8C-tags"><span class="nav-number">1.2.</span> <span class="nav-text">categories 和 tags</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hexo-%E6%8F%92%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">Hexo 插件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-image-link"><span class="nav-number">2.1.</span> <span class="nav-text">hexo-image-link</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -155,7 +155,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -240,13 +240,13 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1><span id="编写格式">编写格式</span></h1><h2><span id="type-属性">type 属性</span></h2><p>在题头部分，<code>type</code> 属性有特殊作用，一般会被识别成特定的页面，比如使用 <code>hexo new page tags</code> 的时候，就会在 <code>source</code> 下生成一个 <code>tags</code> 目录和一个 <code>index.md</code> 文件，此时只需要在 <code>index.md</code> 页面的题头部分编写 <code>type: tags</code> 的话，那么该页面就会对所有文章的标签进行汇总和整理，对应 menu 的 <code>/tags</code> 页面。</p>
+    <div class="post-body" itemprop="articleBody"><h1 id="编写格式"><a href="#编写格式" class="headerlink" title="编写格式"></a>编写格式</h1><h2 id="type-属性"><a href="#type-属性" class="headerlink" title="type 属性"></a>type 属性</h2><p>在题头部分，<code>type</code> 属性有特殊作用，一般会被识别成特定的页面，比如使用 <code>hexo new page tags</code> 的时候，就会在 <code>source</code> 下生成一个 <code>tags</code> 目录和一个 <code>index.md</code> 文件，此时只需要在 <code>index.md</code> 页面的题头部分编写 <code>type: tags</code> 的话，那么该页面就会对所有文章的标签进行汇总和整理，对应 menu 的 <code>/tags</code> 页面。</p>
 <figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: tags</span><br><span class="line">date: 2025-11-28 15:30:11</span><br><span class="line"><span class="section">type: tags</span></span><br><span class="line"><span class="section">---</span></span><br></pre></td></tr></table></figure>
 
 
 
 <p><code>categoreis</code> 也是如此</p>
-<h2><span id="categories-和-tags">categories 和 tags</span></h2><p>一般在文章的题头部分，会编写文章的相关信息，比如编写日期、作者、分类、标签之类，那么应该如何写呢？</p>
+<h2 id="categories-和-tags"><a href="#categories-和-tags" class="headerlink" title="categories 和 tags"></a>categories 和 tags</h2><p>一般在文章的题头部分，会编写文章的相关信息，比如编写日期、作者、分类、标签之类，那么应该如何写呢？</p>
 <p>tags 的写法比较简单，有两种：</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 方式一，使用 yaml 的列表形式</span></span><br><span class="line"><span class="attr">tags:</span></span><br><span class="line">	<span class="bullet">-</span> <span class="string">t1</span></span><br><span class="line">	<span class="bullet">-</span> <span class="string">t2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方式二，使用 js 的数组形式（比较直观，更推荐这种）</span></span><br><span class="line"><span class="attr">tags:</span> [<span class="string">t1</span>, <span class="string">t2</span>]</span><br></pre></td></tr></table></figure>
 
@@ -255,7 +255,7 @@
 
 
 
-<h1><span id="hexo-插件">Hexo 插件</span></h1><h2><span id="hexo-image-link">hexo-image-link</span></h2><p>存在图片 404 的问题？可以按照如下步骤解决：</p>
+<h1 id="Hexo-插件"><a href="#Hexo-插件" class="headerlink" title="Hexo 插件"></a>Hexo 插件</h1><h2 id="hexo-image-link"><a href="#hexo-image-link" class="headerlink" title="hexo-image-link"></a>hexo-image-link</h2><p>存在图片 404 的问题？可以按照如下步骤解决：</p>
 <ol>
 <li>在 <code>_config.yaml</code> 中，将 <code>post_asset_folder</code> 设置为 true</li>
 <li>安装 <code>npm install hexo-image-link --save</code> 依赖</li>
@@ -283,8 +283,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/12/01/%E6%95%99%E7%A8%8B/CS/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" rel="next" title="软件工程">
-                  软件工程 <i class="fa fa-angle-right"></i>
+                <a href="/2025/12/01/%E6%AF%95%E8%AE%BE%E6%96%B9%E6%A1%88/" rel="next" title="家史云谱 ——基于 Next.js 的家族人物生平记忆系统">
+                  家史云谱 ——基于 Next.js 的家族人物生平记忆系统 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>

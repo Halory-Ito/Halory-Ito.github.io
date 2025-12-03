@@ -140,7 +140,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">全局配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.1.</span> <span class="nav-text">代理</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">全局配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">代理</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -155,7 +155,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -253,7 +253,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1><span id="全局配置">全局配置</span></h1><h2><span id="代理">代理</span></h2><p>有时候我们即使开了 VPN ，<code>git</code> 相关操作好像还是会很慢，这大概率就是因为本地的 git 还没有配置代理，可以通过下面的命令来设置：</p>
+    <div class="post-body" itemprop="articleBody"><h1 id="全局配置"><a href="#全局配置" class="headerlink" title="全局配置"></a>全局配置</h1><h2 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h2><p>有时候我们即使开了 VPN ，<code>git</code> 相关操作好像还是会很慢，这大概率就是因为本地的 git 还没有配置代理，可以通过下面的命令来设置：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用 socks5 代理</span></span><br><span class="line">git config --global http.proxy <span class="string">&#x27;socks5://127.0.0.1:7890&#x27;</span></span><br><span class="line">git config --global https.proxy <span class="string">&#x27;socks5://127.0.0.1:7890&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 http 代理</span></span><br><span class="line">git config --global http.proxy <span class="string">&#x27;http://127.0.0.1:7890&#x27;</span></span><br><span class="line">git config --global https.proxy <span class="string">&#x27;http://127.0.0.1:7890&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证配置</span></span><br><span class="line">git config --global --get http.proxy</span><br><span class="line">git config --global --get https.proxy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 取消代理</span></span><br><span class="line">git config --global --<span class="built_in">unset</span> http.proxy</span><br><span class="line">git config --global --<span class="built_in">unset</span> https.proxy</span><br></pre></td></tr></table></figure>
 
     </div>
