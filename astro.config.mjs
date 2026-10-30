@@ -9,6 +9,7 @@ import { remarkGithubCard } from "./src/features/post/remark-github-card";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://halory-ito.github.io",
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
