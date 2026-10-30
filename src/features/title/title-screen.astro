@@ -1,7 +1,7 @@
 ---
 import { titleMenu, assets, routes, site, theme } from "../../config";
 import { sortedPosts } from "../post/lib";
-import { maskAttrs, maskStyle } from "../theme/mask-style";
+import { maskAttrs, maskBgVars, maskVars } from "../theme/mask-style";
 import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/base-layout.astro";
 import FooterInfo from "../layout/footer-info.astro";
@@ -17,15 +17,17 @@ const menuHref = (href: string) =>
 
 <BaseLayout title={`${site.name} | ${site.description}`} showHeader={false} showFooter={false}>
   <div class="relative h-screen w-screen bg-[#15122d]">
-    <div class="absolute inset-0">
+    <div class="absolute inset-0 overflow-hidden">
       <Image
         src={assets.titleBackground}
         alt="标题背景"
         width={theme.imageDefaults.background.width}
         height={theme.imageDefaults.background.height}
         class="h-full w-full object-cover"
+        data-vn-mask-bg
+        style={maskBgVars(theme.masks.title)}
       />
-      <div class="absolute inset-0" {...maskAttrs('title')} style={maskStyle(theme.masks.title)}></div>
+      <div class="absolute inset-0" {...maskAttrs('title')} style={maskVars(theme.masks.title)}></div>
     </div>
 
     <main

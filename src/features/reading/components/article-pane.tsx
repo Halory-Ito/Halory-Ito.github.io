@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { PostParagraph } from '../types';
-import { maskAttrs, maskStyle, type MaskConfig } from '../../theme/mask-style';
+import { maskAttrs, maskVars, type MaskConfig } from '../../theme/mask-style';
 
 /** 暴露给 reader-scene 的命令接口（SKIP 跳到末尾、TOC 定位到某 beat） */
 export interface ArticlePaneApi {
@@ -145,7 +145,7 @@ export default function ArticlePane({
   return (
     <div data-ui-block className="vn-ui absolute inset-0 flex flex-col px-[clamp(2rem,6vw,6rem)] pb-16 pt-24">
       {/* 衬底蒙层：与 NVL 视图一致，固定于视口不随正文滚动 */}
-      <div className="absolute inset-0" {...maskAttrs('nvl')} style={maskStyle(maskNvl)} aria-hidden="true" />
+      <div className="absolute inset-0" {...maskAttrs('nvl')} style={maskVars(maskNvl)} aria-hidden="true" />
       <div
         ref={scrollRef}
         id="article-column"

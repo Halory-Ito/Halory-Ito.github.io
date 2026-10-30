@@ -3,7 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import SiteHeader from '../features/layout/site-header.astro';
 import SiteFooter from '../features/layout/site-footer.astro';
 import MaskControl from '../features/layout/mask-control.astro';
-import { layout, maskControl, site, theme } from '../config';
+import { layout, maskControl, site } from '../config';
 
 interface Props {
   title?: string;
@@ -16,13 +16,6 @@ interface Props {
 
 const { title = site.name, showHeader = true, showFooter = true, showMaskControl = true } = Astro.props;
 const { autoHide, topTriggerPx, bottomHideZonePx, pageTransition: pt } = layout;
-/** 各类型蒙层的颜色：全局调节时按 data-vn-mask 类型 + 各自颜色生成覆盖规则 */
-const maskColors = {
-  page: theme.masks.page.color,
-  cover: theme.masks.cover.color,
-  title: theme.masks.title.color,
-  nvl: theme.masks.nvl.color
-};
 
 /**
  * 页面级过渡动画描述（Astro View Transitions 的原始动画对象形式）：
@@ -62,50 +55,109 @@ import '../styles/global.css';
     <meta name="description" content={site.description} />
     <title>{title}</title>
     {
-      /* 蒙层偏好要在首帧之前生效：head 里的内联脚本把偏好编译成一条
-         [data-vn-mask="…"] 覆盖规则（颜色来自 config，透明度/模糊来自 localStorage），
-         body 解析时蒙层首帧即正确，不会先闪默认值。
-         View Transitions 会用新文档替换 head，因此 before-swap 阶段把同一份规则
-         写进新文档的 <style>，导航过程中也不会闪回默认值。 */
+      /* 蒙层偏好写成 html 上的 CSS 变量，而不是往 <style> 里注入覆盖规则。
+         注入规则在换页时会被 head 合并拆掉，textContent 重写还会让浏览器丢掉样式一帧；
+         View Transitions 正好在这一帧拍下新页快照，淡入动画就把错误的透明度/模糊放出来。
+         变量在首屏脚本和 before-swap 里写到新文档的 html 上，swap 时随属性一并拷过来，
+         新页蒙层第一帧就继承到正确值。 */
     }
-    <style id="vn-mask-prefs" is:inline></style>
     <script
       is:inline
       define:vars={{
         maskKey: maskControl.storageKey,
-        maskColors
+        opacityMin: maskControl.opacityMin,
+        opacityMax: maskControl.opacityMax,
+        blurMin: maskControl.blurMin,
+        blurMax: maskControl.blurMax
       }}
     >
       (() => {
-        const STYLE_ID = 'vn-mask-prefs';
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
         const readPrefs = () => {
           try {
             const raw = localStorage.getItem(maskKey);
-            return raw ? JSON.parse(raw) : null;
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            const opacity = Number(parsed.opacity);
+            const blur = Number(parsed.blur);
+            if (!Number.isFinite(opacity) || !Number.isFinite(blur)) return null;
+            return {
+              opacity: clamp(opacity, opacityMin, opacityMax),
+              blur: clamp(blur, blurMin, blurMax)
+            };
           } catch {
             return null;
           }
         };
         const percent = (value) => `${Math.round(value * 10000) / 100}%`;
-        /** 每个类型一条规则，只命中带 data-vn-mask 的蒙层；!important 覆盖组件内联的基础值 */
-        const cssFor = (prefs) =>
-          Object.keys(maskColors)
-            .map(
-              (kind) =>
-                `[data-vn-mask="${kind}"]{background-color:color-mix(in srgb, ${maskColors[kind]} ${percent(prefs.opacity)}, transparent) !important;backdrop-filter:blur(${prefs.blur}px) !important;}`
-            )
-            .join('');
-        const render = (doc) => {
-          const style = (doc || document).getElementById(STYLE_ID);
-          if (!style) return;
-          const prefs = readPrefs();
-          style.textContent =
-            prefs && typeof prefs.opacity === 'number' && typeof prefs.blur === 'number' ? cssFor(prefs) : '';
+        const backdrop = (blur) => (blur > 0 ? `blur(${blur}px)` : 'none');
+        /* 与 mask-style.ts 的 maskBlurScale 同一公式：1 + blur / 160 */
+        const blurScale = (blur) => (blur > 0 ? String(Math.round((1 + blur / 160) * 1000) / 1000) : null);
+        const setVar = (root, name, value) => {
+          if (value == null) {
+            if (root.style.getPropertyValue(name)) root.style.removeProperty(name);
+            return;
+          }
+          if (root.style.getPropertyValue(name) !== value) root.style.setProperty(name, value);
         };
-        /* 悬浮按钮改动偏好后调用同一个 render，避免两处生成逻辑不一致 */
-        window.__vnblogMaskStyles = render;
-        render();
-        document.addEventListener('astro:before-swap', (event) => render(event.newDocument));
+        const apply = (doc) => {
+          const root = (doc || document).documentElement;
+          if (!root) return;
+          const prefs = readPrefs();
+          const opacity = prefs ? percent(prefs.opacity) : null;
+          const blur = prefs ? backdrop(prefs.blur) : null;
+          const scale = prefs ? blurScale(prefs.blur) : null;
+          /* swap 只拷贝 html 属性，不读 CSSOM。新文档必须把变量写进 style 属性。 */
+          if (doc && doc !== document) {
+            const parts = [];
+            if (opacity) parts.push(`--vn-mask-opacity:${opacity}`);
+            if (blur) parts.push(`--vn-mask-backdrop:${blur}`);
+            if (scale) parts.push(`--vn-mask-bg-scale:${scale}`);
+            if (parts.length) root.setAttribute('style', parts.join(';'));
+            else root.removeAttribute('style');
+            return;
+          }
+          setVar(root, '--vn-mask-opacity', opacity);
+          setVar(root, '--vn-mask-backdrop', blur);
+          setVar(root, '--vn-mask-bg-scale', scale);
+        };
+        if (!window.__vnblogMaskStyles) {
+          window.__vnblogMaskStyles = apply;
+          document.addEventListener('astro:before-swap', (event) => apply(event.newDocument));
+
+          /* 背景图要在新页快照之前解码完，否则过渡拍到的是纯色底。
+             before-preparation 的 loader 可以包一层，等新文档里的背景图解码后再开始过渡。 */
+          const decodeImage = (url) =>
+            new Promise((resolve) => {
+              const image = new Image();
+              image.onload = () => (image.decode ? image.decode().catch(() => {}).finally(resolve) : resolve());
+              image.onerror = resolve;
+              image.src = url;
+            });
+          const preloadBackgrounds = async (event) => {
+            try {
+              const urls = [...event.newDocument.querySelectorAll('img[data-vn-mask-bg]')]
+                .map((image) => image.getAttribute('src'))
+                .filter(Boolean)
+                .map((src) => new URL(src, event.to).href);
+              if (!urls.length) return;
+              await Promise.race([
+                Promise.all([...new Set(urls)].map(decodeImage)),
+                new Promise((resolve) => setTimeout(resolve, 1200))
+              ]);
+            } catch {
+              /* 预加载失败不阻断导航，最多回到旧行为 */
+            }
+          };
+          document.addEventListener('astro:before-preparation', (event) => {
+            const load = event.loader;
+            event.loader = async () => {
+              await load();
+              await preloadBackgrounds(event);
+            };
+          });
+        }
+        apply();
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

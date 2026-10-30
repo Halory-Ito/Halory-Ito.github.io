@@ -4,9 +4,8 @@ import { maskControl } from '../../config';
 
 /**
  * 全局蒙层调节：右下角悬浮按钮 + 透明度/模糊滑杆。
- * 滑杆值保存后，调用 BaseLayout 内联脚本暴露的 render 重新生成
- * [data-vn-mask] 覆盖规则；所有带标记的蒙层即时生效。偏好持久化，
- * 阅读页封面有独立的 BG 面板，本控件不覆盖它。
+ * 滑杆值保存后，调用 BaseLayout 内联脚本把偏好写到 html 的 CSS 变量上，
+ * 带 data-vn-mask 的蒙层即时生效。阅读页封面有独立的 BG 面板，本控件不覆盖它。
  */
 const { labels } = maskControl;
 const opacityText = `${Math.round(maskControl.defaults.opacity * 100)}%`;
@@ -85,9 +84,8 @@ const blurText = `${maskControl.defaults.blur}px`;
 
   /**
    * 全局蒙层调节的客户端逻辑：
-   * - 滑杆值保存到 localStorage，并调用 BaseLayout 内联脚本暴露的 render
-   *   重新生成 [data-vn-mask] 覆盖规则，所有蒙层实时变化；
-   * - 偏好保存在 localStorage，跨页面（含 View Transitions）保持；
+   * - 滑杆值保存到 localStorage，并调用 BaseLayout 内联脚本把 CSS 变量写到 html 上；
+   * - 换页时由 before-swap 把同一组变量写到新文档，这里不再重写样式；
    * - 事件委托挂在 document 上，脚本只注册一次，导航后依然有效。
    */
   interface MaskPrefs {
@@ -115,7 +113,7 @@ const blurText = `${maskControl.defaults.blur}px`;
     }
   };
 
-  /** 偏好为 null / 清除后，覆盖规则清空，回到各蒙层自身的配置值 */
+  /** 偏好清除后去掉根变量，蒙层回到各自配置里的默认值 */
   const syncMaskStyles = () => {
     const host = window as typeof window & { __vnblogMaskStyles?: (doc?: Document) => void };
     host.__vnblogMaskStyles?.();
@@ -154,11 +152,10 @@ const blurText = `${maskControl.defaults.blur}px`;
     }
   };
 
-  /** 首次渲染与每次 View Transition 后：同步面板状态（样式已由内联脚本处理） */
+  /** 同步滑杆。样式变量由 head 脚本在换页前写好，这里再写一次会在过渡中途改根样式。 */
   const init = () => {
     const stored = readStored();
     prefs = stored ?? DEFAULTS;
-    syncMaskStyles();
     syncWidgets();
     setOpen(false);
   };
@@ -204,11 +201,6 @@ const blurText = `${maskControl.defaults.blur}px`;
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') setOpen(false);
-    });
-
-    /* before-swap 已由 BaseLayout 的内联脚本把覆盖规则写进新文档；这里再兜底一次 */
-    document.addEventListener('astro:after-swap', () => {
-      syncMaskStyles();
     });
 
     document.addEventListener('astro:page-load', init);

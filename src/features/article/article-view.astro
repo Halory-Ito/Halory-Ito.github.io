@@ -3,7 +3,7 @@ import { render } from 'astro:content';
 import { fallbackCoverFor } from '../post/lib';
 import { taxonomyHref } from '../post/taxonomy';
 import { article, routes, site, theme } from '../../config';
-import { maskAttrs, maskStyle } from '../theme/mask-style';
+import { maskAttrs, maskBgVars, maskVars } from '../theme/mask-style';
 import { Image } from 'astro:assets';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import BaseLayout from '../../layouts/base-layout.astro';
@@ -26,15 +26,17 @@ const readHref = `${routes.read}${post.id}`;
 <BaseLayout title={`${site.name} | ${post.data.title}`}>
   <div class="relative min-h-dvh bg-[#15122d]">
     <!-- 背景与视口对齐（fixed），不随文章高度拉伸 -->
-    <div class="fixed inset-0">
+    <div class="fixed inset-0 overflow-hidden">
       <Image
         src={cover}
         alt="文章背景"
         width={coverDims.width}
         height={coverDims.height}
         class="h-full w-full object-cover"
+        data-vn-mask-bg
+        style={maskBgVars(theme.masks.page)}
       />
-      <div class="absolute inset-0" {...maskAttrs('page')} style={maskStyle(theme.masks.page)}></div>
+      <div class="absolute inset-0" {...maskAttrs('page')} style={maskVars(theme.masks.page)}></div>
     </div>
 
     <main class="relative z-10 mx-auto max-w-6xl px-6 pb-24">
@@ -53,8 +55,10 @@ const readHref = `${routes.read}${post.id}`;
           width={coverDims.width}
           height={coverDims.height}
           class="h-72 w-full object-cover sm:h-96"
+          data-vn-mask-bg
+          style={maskBgVars(theme.masks.cover)}
         />
-        <div class="absolute inset-0" {...maskAttrs('cover')} style={maskStyle(theme.masks.cover)}></div>
+        <div class="absolute inset-0" {...maskAttrs('cover')} style={maskVars(theme.masks.cover)}></div>
         <div class="absolute inset-x-0 bottom-0 p-8 sm:p-12">
           <div class="flex flex-wrap items-center gap-3 text-[0.7rem] tracking-[0.35em] text-white/60 uppercase">
             <a

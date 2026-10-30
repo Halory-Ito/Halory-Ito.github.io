@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ReaderBeat, ReaderTheme, NvlStyle, PostParagraph } from '../types';
-import { maskAttrs, maskStyle } from '../../theme/mask-style';
+import { maskAttrs, maskVars } from '../../theme/mask-style';
 
 interface NvlViewProps {
   progress: string;
@@ -69,7 +69,7 @@ export default function NvlView({
       data-ui-block
       {...maskAttrs('nvl')}
       className="vn-ui absolute inset-0 flex flex-col px-[clamp(2rem,8vw,6rem)] pb-10 pt-24"
-      style={{ ...maskStyle(theme.maskNvl) }}
+      style={maskVars(theme.maskNvl)}
     >
       <div className="flex items-center justify-end">
         <span className="text-[0.75rem] tracking-[0.35em] text-white/55">{progress}</span>

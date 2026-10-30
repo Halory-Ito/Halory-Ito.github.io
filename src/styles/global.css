@@ -20,6 +20,30 @@ body {
   text-autospace: "normal";
 }
 
+/*
+ * 全局蒙层。颜色和各类型默认值写在元素的 CSS 变量上（maskVars），
+ * 用户调节的透明度 / 模糊写在 html 的 --vn-mask-opacity / --vn-mask-backdrop。
+ * 规则本身是静态的，View Transitions 不会在换页时拆掉再注入，因此不会闪帧。
+ * 铺满视口的背景图用 filter 模糊（快照能采到）；NVL 衬底没有独立背景图，仍用 backdrop-filter。
+ */
+[data-vn-mask] {
+  background-color: color-mix(
+    in srgb,
+    var(--vn-mask-color) var(--vn-mask-opacity, var(--vn-mask-opacity-default)),
+    transparent
+  );
+}
+
+[data-vn-mask="nvl"] {
+  -webkit-backdrop-filter: var(--vn-mask-backdrop, var(--vn-mask-backdrop-default));
+  backdrop-filter: var(--vn-mask-backdrop, var(--vn-mask-backdrop-default));
+}
+
+[data-vn-mask-bg] {
+  filter: var(--vn-mask-backdrop, var(--vn-mask-backdrop-default, none));
+  scale: var(--vn-mask-bg-scale, var(--vn-mask-bg-scale-default, 1));
+}
+
 /* 《原型》全屏阅读容器 */
 .reading-fullscreen {
   position: relative;
