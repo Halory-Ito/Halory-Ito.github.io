@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VNBlog | 阅读：入夜的车站</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.13/dist/index.global.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
+    body { font-family: 'Cormorant Garamond', 'FangSong', '仿宋', serif; color: #f8f7ff; background-color: #15122d; overflow: hidden; text-rendering: optimizeLegibility; }
+    .hidden { display: none !important; }
+    .scene { position: relative; height: 100dvh; width: 100vw; overflow: hidden; }
+    .layer { position: absolute; inset: 0; pointer-events: none; }
+    .layer img { height: 100%; width: 100%; object-fit: cover; }
+    .bg-layer::after { content: ''; position: absolute; inset: 0; background-color: rgba(9, 7, 24, 0.45); }
+
+    /* ===== ADV 模式：底部对话框 ===== */
+    .adv-layer { display: flex; flex-direction: column; justify-content: flex-end; }
+    .dialogue-panel { position: relative; margin: 0 auto 4vh; width: min(1100px, calc(100vw - 3rem)); border-radius: 14px; background-color: rgba(22, 18, 56, 0.62); border: 1px solid rgba(226, 222, 255, 0.28); padding: clamp(1.2rem, 2vw, 2.2rem); }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+    .panel-title { font-size: 0.9rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(248, 247, 255, 0.65); }
+    .progress { font-size: 0.75rem; letter-spacing: 0.35em; color: rgba(248, 247, 255, 0.55); }
+    .text-body { margin-top: 1.4rem; min-height: 7rem; font-size: clamp(1rem, 1.2vw, 1.25rem); line-height: 2; letter-spacing: 0.08em; }
+    .caret { display: inline-block; width: 0.6rem; height: 1.4rem; margin-left: 0.4rem; vertical-align: text-bottom; background-color: rgba(248, 247, 255, 0.9); animation: blink 900ms steps(2) infinite; }
+    .caret.hidden { display: none; }
+    @keyframes blink { to { opacity: 0; } }
+    .panel-foot { display: flex; justify-content: flex-end; }
+    .next-indicator { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(248, 247, 255, 0.5); opacity: 0; transition: opacity 200ms ease; }
+    .next-indicator.is-visible { opacity: 1; }
+    .next-indicator::after { content: '▸'; animation: float 1200ms ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+
+    /* ===== NVL 模式：全屏文本 ===== */
+    .nvl-head { justify-content: flex-end; }
+    .nvl-panel { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 5.2rem clamp(2rem, 8vw, 6rem) 2.4rem; background-color: rgba(15, 12, 34, 0.78); }
+    .nvl-scroll { flex: 1; width: 100%; max-width: 46rem; margin: 0 auto; overflow-y: auto; padding: 1rem 0.5rem; }
+    .nvl-line { margin: 0 0 1.7em 0; font-size: 1.15rem; line-height: 2.15; letter-spacing: 0.08em; color: rgba(248, 247, 255, 0.92); }
+    .nvl-end { display: flex; justify-content: flex-end; }
+
+    /* ===== 顶部栏 ===== */
+    .top-bar { pointer-events: auto; position: absolute; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem clamp(1.5rem, 4vw, 4rem); font-size: 0.8rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(248, 247, 255, 0.6); background-color: rgba(15, 12, 34, 0.55); }
+    .top-bar-group { display: flex; gap: 1.2rem; align-items: center; }
+    .top-link { display: inline-flex; align-items: center; gap: 0.6rem; transition: color 160ms ease; background: none; border: none; cursor: pointer; font: inherit; color: inherit; letter-spacing: inherit; padding-bottom: 2px; border-bottom: 1px solid transparent; }
+    .top-link:hover { color: rgba(248, 247, 255, 0.95); }
+    .top-link.is-on { color: rgba(196, 190, 255, 1); border-bottom: 1px solid rgba(196, 190, 255, 0.7); }
+
+    /* ===== UI 隐藏（鼠标移到画面底部边缘时，只留背景） ===== */
+    .top-bar, #advPanel, #nvlPanel, .side-panel { transition: opacity 260ms ease; }
+    .scene.ui-hidden .top-bar, .scene.ui-hidden #advPanel, .scene.ui-hidden #nvlPanel, .scene.ui-hidden .side-panel { opacity: 0; pointer-events: none; }
+
+    /* ===== 左右侧栏（元数据 / TOC） ===== */
+    .side-panel { position: fixed; top: 0; bottom: 0; width: min(320px, 86vw); z-index: 40; padding: 5.6rem 1.8rem 2rem; background-color: rgba(15, 12, 34, 0.82); display: flex; flex-direction: column; gap: 0.9rem; overflow-y: auto; pointer-events: auto; transition: transform 260ms ease, opacity 260ms ease; user-select: text; cursor: default; }
+    .side-panel.left { left: 0; transform: translateX(-100%); border-right: 1px solid rgba(226, 222, 255, 0.2); }
+    .side-panel.right { right: 0; transform: translateX(100%); border-left: 1px solid rgba(226, 222, 255, 0.2); }
+    .side-panel.left.show, .side-panel.right.show { transform: translateX(0); }
+    .side-title { font-size: 0.7rem; letter-spacing: 0.5em; text-transform: uppercase; color: rgba(248, 247, 255, 0.45); }
+    .side-name { font-size: 1.15rem; letter-spacing: 0.3em; }
+    .meta-row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(226, 222, 255, 0.12); font-size: 0.92rem; color: rgba(248, 247, 255, 0.78); }
+    .meta-row span:first-child { color: rgba(248, 247, 255, 0.45); letter-spacing: 0.25em; }
+    .toc-item { text-align: left; padding: 0.55rem 0.9rem; border-radius: 8px; border: 1px solid transparent; background: none; cursor: pointer; font: inherit; color: rgba(248, 247, 255, 0.75); letter-spacing: 0.2em; transition: all 160ms ease; }
+    .toc-item:hover { background-color: rgba(196, 190, 255, 0.12); color: #fff; }
+    .toc-item.is-current { border-color: rgba(196, 190, 255, 0.5); color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <!-- 背景：文章图片优先，无图时用 cg 兜底 -->
+    <div class="layer bg-layer">
+      <img src="../public/images/cg/ev1013a.png" alt="文章背景（cg 兜底）">
+    </div>
+
+    <!-- ADV 模式 -->
+    <div class="layer adv-layer" id="advPanel">
+      <div class="dialogue-panel">
+        <div class="panel-head">
+          <span class="panel-title">入夜的车站</span>
+          <span class="progress js-progress">1 / 8</span>
+        </div>
+        <div class="text-body"><span id="typedText"></span><span class="caret" id="caretAdv"></span></div>
+        <div class="panel-foot"><span class="next-indicator" id="indAdv">点击继续</span></div>
+      </div>
+    </div>
+
+    <!-- NVL 模式 -->
+    <div class="nvl-panel hidden" id="nvlPanel">
+      <div class="panel-head nvl-head">
+        <span class="progress js-progress">1 / 8</span>
+      </div>
+      <div class="nvl-scroll" id="nvlScroll">
+        <div id="nvlTexts"></div>
+      </div>
+      <div class="nvl-end"><span class="next-indicator" id="indNvl">点击继续</span></div>
+    </div>
+
+    <header class="top-bar" id="topBar">
+      <div class="top-bar-group">
+        <a class="top-link" href="index.html"><span>←</span><span>TITLE</span></a>
+        <a class="top-link" href="article.html"><span>ARTICLE</span></a>
+        <a class="top-link" href="archive.html"><span>ARCHIVE</span></a>
+      </div>
+      <div class="top-bar-group">
+        <button class="top-link" id="autoBtn"><span>AUTO</span></button>
+        <button class="top-link" id="modeBtn"><span id="modeLabel">NVL</span></button>
+        <a class="top-link" href="backlog.html"><span>LOG</span></a>
+        <button class="top-link" id="skipBtn"><span>SKIP</span></button>
+      </div>
+    </header>
+
+    <!-- 左侧：文章元数据（鼠标靠近左缘时滑入） -->
+    <aside class="side-panel left" id="metaPanel">
+      <p class="side-title">INFO</p>
+      <h2 class="side-name">入夜的车站</h2>
+      <div class="meta-row"><span>作者</span><span>Shigure</span></div>
+      <div class="meta-row"><span>日期</span><span>2026-10-29</span></div>
+      <div class="meta-row"><span>分类</span><span>随笔</span></div>
+      <div class="meta-row"><span>标签</span><span>SCENE · RAIN</span></div>
+      <div class="meta-row"><span>字数</span><span>约 620 字</span></div>
+      <div class="meta-row"><span>进度</span><span class="js-progress">1 / 8</span></div>
+    </aside>
+
+    <!-- 右侧：文章 TOC（鼠标靠近右缘时滑入） -->
+    <aside class="side-panel right" id="tocPanel">
+      <p class="side-title">TOC</p>
+      <button class="toc-item" data-index="0">开场</button>
+      <button class="toc-item" data-index="3">迟到的人</button>
+      <button class="toc-item" data-index="6">末班车进站前</button>
+      <button class="toc-item" data-index="7">尾声</button>
+    </aside>
+  </div>
+
+  <script>
+    // 博客文章正文按段落拆分，逐段呈现；这是「读文章」，不是角色对话
+    const script = [
+      "已经快到末班电车的时间了。车站的灯把细雨照成一片亮银色，铁轨尽头传来风声，却迟迟等不来进站前的提示音。",
+      "我站在月台的老位置，把手拢进外套口袋，看雨水顺着遮雨棚的边缘连成一条线。",
+      "约定的时间已经过了五分钟。手机在口袋里安安静静，月台上只剩我一个人，连自动售货机的灯光都比平时显得亮一些。",
+      "脚步声是从车站外面的坡道上传来的。由远及近，节奏有些乱，像是小跑，又像是在忍着不跑。",
+      "等到那个身影冲进遮雨棚的范围，头发上还挂着水珠，我才发现自己也悄悄松了口气。",
+      "借口一如既往地离谱，语气却理直气壮。我想了想，把已经到嘴边的责备咽了回去，只说了句「下不为例」。",
+      "列车进站的警报声响起时，雨小了一些。我们并排站在安全线后面，谁也没有先开口。",
+      "有些夜晚注定普通，普通到不值得被记住。但正因为普通，才会在很多年以后的某个雨天，被毫无预兆地想起——比如现在。"
+    ];
+
+    const scene = document.getElementById('scene');
+    const advPanel = document.getElementById('advPanel');
+    const nvlPanel = document.getElementById('nvlPanel');
+    const typedText = document.getElementById('typedText');
+    const caretAdv = document.getElementById('caretAdv');
+    const indAdv = document.getElementById('indAdv');
+    const indNvl = document.getElementById('indNvl');
+    const nvlTexts = document.getElementById('nvlTexts');
+    const nvlScroll = document.getElementById('nvlScroll');
+    const modeBtn = document.getElementById('modeBtn');
+    const modeLabel = document.getElementById('modeLabel');
+    const skipBtn = document.getElementById('skipBtn');
+    const autoBtn = document.getElementById('autoBtn');
+    const metaPanel = document.getElementById('metaPanel');
+    const tocPanel = document.getElementById('tocPanel');
+
+    let mode = null;
+    let index = 0, charIndex = 0, typing = false, timer = null;
+    let cur = null; // NVL 当前行 { span, car }
+    let auto = false, autoTimer = null;
+
+    function scrollNvl() { nvlScroll.scrollTop = nvlScroll.scrollHeight; }
+    function setIndicator(text, visible) {
+      [indAdv, indNvl].forEach(el => { el.textContent = text; el.classList.toggle('is-visible', !!visible); });
+    }
+    function updateProgress() {
+      const t = (index + 1) + ' / ' + script.length;
+      document.querySelectorAll('.js-progress').forEach(el => el.textContent = t);
+      const pct = Math.round(((index + 1) / script.length) * 100) + '%';
+      document.querySelectorAll('.js-percent').forEach(el => el.textContent = pct);
+      document.querySelectorAll('.toc-item').forEach(b => {
+        b.classList.toggle('is-current', +b.dataset.index === index);
+      });
+    }
+    function hideCaret() { caretAdv.classList.add('hidden'); if (cur && cur.car) cur.car.classList.add('hidden'); }
+
+    function scheduleAuto() {
+      clearTimeout(autoTimer);
+      if (auto) autoTimer = setTimeout(next, 1500);
+    }
+    function endLine(full) {
+      clearInterval(timer); typing = false; hideCaret();
+      setIndicator(full ? full : '点击继续', true);
+      if (full) { setAuto(false); } else { scheduleAuto(); }
+    }
+
+    function startTyping() {
+      clearTimeout(autoTimer);
+      clearInterval(timer);
+      setIndicator('', false);
+      const text = script[index];
+      typing = true; charIndex = 0;
+      updateProgress();
+      if (mode === 'ADV') {
+        typedText.textContent = '';
+        caretAdv.classList.remove('hidden');
+        timer = setInterval(() => {
+          if (charIndex < text.length) { typedText.textContent += text[charIndex++]; }
+          else { endLine(); }
+        }, 38);
+      } else {
+        cur = appendNvlLine();
+        timer = setInterval(() => {
+          if (charIndex < text.length) { cur.span.textContent += text[charIndex++]; scrollNvl(); }
+          else { endLine(); }
+        }, 38);
+      }
+    }
+
+    function appendNvlLine() {
+      const p = document.createElement('p');
+      p.className = 'nvl-line';
+      const s = document.createElement('span');
+      const c = document.createElement('span');
+      c.className = 'caret';
+      p.appendChild(s); p.appendChild(c);
+      nvlTexts.appendChild(p);
+      scrollNvl();
+      return { span: s, car: c };
+    }
+
+    function showAll() {
+      const text = script[index];
+      if (mode === 'ADV') { typedText.textContent = text; }
+      else if (cur) { cur.span.textContent = text; scrollNvl(); }
+      charIndex = text.length;
+      endLine();
+    }
+
+    function next() {
+      clearTimeout(autoTimer);
+      if (typing) { showAll(); return; }
+      if (index < script.length - 1) { index++; startTyping(); }
+      else { endLine('读完啦 · 返回归档'); }
+    }
+
+    function setAuto(v) {
+      auto = v;
+      autoBtn.classList.toggle('is-on', v);
+      if (!v) clearTimeout(autoTimer);
+      else if (!typing) scheduleAuto();
+    }
+    autoBtn.addEventListener('click', (e) => { e.stopPropagation(); setAuto(!auto); });
+
+    function setMode(m) {
+      if (mode === m) return;
+      mode = m;
+      localStorage.setItem('vnblog-mode', m);
+      modeLabel.textContent = m === 'ADV' ? 'NVL' : 'ADV';
+      advPanel.classList.toggle('hidden', m !== 'ADV');
+      nvlPanel.classList.toggle('hidden', m !== 'NVL');
+      if (m === 'NVL') {
+        // 已读段落一次性铺开，当前段重新打字
+        nvlTexts.innerHTML = '';
+        for (let i = 0; i < index; i++) {
+          const line = appendNvlLine();
+          line.span.textContent = script[i];
+          line.car.classList.add('hidden');
+        }
+        scrollNvl();
+      }
+      cur = null;
+      startTyping();
+    }
+
+    modeBtn.addEventListener('click', (e) => { e.stopPropagation(); setMode(mode === 'ADV' ? 'NVL' : 'ADV'); });
+    skipBtn.addEventListener('click', (e) => { e.stopPropagation(); showAll(); });
+    scene.addEventListener('click', (e) => {
+      if (e.target.closest('#topBar')) return;
+      if (e.target.closest('.side-panel')) return;
+      next();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); next(); }
+      if (e.key === 'Escape') { window.location.href = 'index.html'; }
+    });
+
+    // ===== 鼠标边缘交互 =====
+    // 左右感应区宽度加大到 64px；侧栏展开后，只要指针停留其上就保持显示，方便复制与点击
+    const EDGE_TRIGGER = 64;   // 左右边缘感应区宽度(px)
+    const SIDE_PANEL_W = 320;  // 侧栏宽度，需与 CSS 的 width: min(320px, 86vw) 一致
+    let metaOn = false, tocOn = false;
+
+    window.addEventListener('mousemove', (e) => {
+      const overMeta = e.target.closest('#metaPanel') != null;
+      const overToc = e.target.closest('#tocPanel') != null;
+      // 移到底部边缘：隐藏所有组件只留背景（指针停在侧栏上时除外，避免误触发）
+      const nearBottom = e.clientY > window.innerHeight - 36 && !overMeta && !overToc;
+
+      // 左缘触发：进入左侧感应区，或（已展开时）指针位于侧栏范围内
+      const inMetaZone = e.clientX <= EDGE_TRIGGER
+        || (metaOn && e.clientX <= SIDE_PANEL_W + 8)
+        || overMeta;
+      // 右缘触发：进入右侧感应区，或（已展开时）指针位于侧栏范围内
+      const inTocZone = e.clientX >= window.innerWidth - EDGE_TRIGGER
+        || (tocOn && e.clientX >= window.innerWidth - SIDE_PANEL_W - 8)
+        || overToc;
+
+      metaOn = !nearBottom && inMetaZone;
+      tocOn = !nearBottom && inTocZone;
+      metaPanel.classList.toggle('show', metaOn);
+      tocPanel.classList.toggle('show', tocOn);
+      scene.classList.toggle('ui-hidden', nearBottom);
+    });
+
+    // TOC 跳转：定位到对应段落
+    document.querySelectorAll('.toc-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const i = Math.min(+btn.dataset.index, script.length - 1);
+        index = i;
+        if (mode === 'NVL') { nvlTexts.innerHTML = ''; cur = null; }
+        startTyping();
+      });
+    });
+
+    const saved = localStorage.getItem('vnblog-mode') || 'ADV';
+    setMode(saved);
+  </script>
+</body>
+</html>

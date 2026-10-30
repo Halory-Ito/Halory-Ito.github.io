@@ -1,0 +1,61 @@
+---
+import ReaderScene from '../../features/reading/reader-scene';
+import { sortedPosts, fallbackCoverFor } from '../../features/post/lib';
+import { resolvePostScript } from '../../features/post/resolve-post';
+import { reading, site, theme } from '../../config';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const posts = await sortedPosts();
+  /* id 可能来自 frontmatter 的 slug（扁平），也可能是嵌套目录路径（含 /），故用 rest 路由 */
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+/** 文章内相对路径的图片，以 md 文件所在目录为基准；代码/图片/富文本 beat 全部在此解析 */
+const baseDir = post.filePath?.split('/').slice(0, -1).join('/') || '';
+const script = await resolvePostScript(post.body ?? '', { baseDir });
+
+/** 文章封面前置；无 cover 时按文章 id 挑选一张预置背景 */
+const cover = post.data.cover ?? fallbackCoverFor(post.id);
+
+const readerProps = {
+  title: post.data.title,
+  slug: post.id,
+  cover,
+  paragraphs: script.paragraphs,
+  sections: script.sections,
+  meta: {
+    author: post.data.author,
+    date: post.data.pubDate.toISOString().slice(0, 10),
+    category: post.data.category,
+    tags: post.data.tags.join(' · '),
+    words: `${script.wordCount} 字`
+  },
+  typeSpeedMs: reading.typeSpeedMs,
+  autoDelayMs: reading.autoDelayMs,
+  edgeTriggerPx: reading.edgeTriggerPx,
+  sideDrawerPx: reading.sideDrawerPx,
+  modeStorageKey: reading.modeStorageKey,
+  theme: {
+    panel: theme.panel,
+    drawer: theme.drawer,
+    maskCover: theme.masks.cover,
+    maskNvl: theme.masks.nvl
+  },
+  drawerShape: theme.drawerShape,
+  maskPanel: reading.maskPanel,
+  nvlStyle: reading.nvl,
+  articleStyle: reading.article,
+  metaLabels: reading.metaLabels,
+  hints: reading.hints
+};
+---
+
+<BaseLayout title={`${site.name} | 阅读：${post.data.title}`} showMaskControl={false}>
+  <ReaderScene client:load {...readerProps} />
+</BaseLayout>

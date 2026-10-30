@@ -1,0 +1,17 @@
+---
+import { layout, theme } from '../../config';
+import ListHeader from '../list/list-header.astro';
+
+/** Layout 级公共 Header：品牌占位 + navLinks；autoHide 配置控制是否常驻 */
+const { autoHide } = layout;
+---
+
+<header
+  data-chrome="top"
+  class={`list-chrome z-50 ${
+    autoHide ? 'fixed inset-x-0 top-0 -translate-y-full' : 'sticky top-0'
+  }`}
+  style={{ backgroundColor: theme.topBar }}
+>
+  <ListHeader />
+</header>

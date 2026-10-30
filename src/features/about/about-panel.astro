@@ -1,0 +1,33 @@
+---
+import { getCollection, render } from 'astro:content';
+import { assets, site, theme } from '../../config';
+import { veilStyle } from '../theme/mask-style';
+import ListShell from '../list/list-shell.astro';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+/** 关于页由单文件 markdown（src/content/about.md）驱动；::github 卡片由 remark-github-card 渲染 */
+const aboutEntry = (await getCollection('about'))[0];
+const { Content } = await render(aboutEntry);
+const eyebrow = aboutEntry.data.eyebrow ?? 'ABOUT';
+const pageTitle = aboutEntry.data.title ?? site.name;
+---
+
+<BaseLayout title={`${site.name} | ABOUT`}>
+  <ListShell bgImage={assets.layoutBackgrounds.about} eyebrow={eyebrow}>
+    <div class="relative flex min-h-dvh items-center justify-center px-4 py-10">
+      <!-- 无边框衬底：横向“左-中-右”透明度高-低-高的渐变（config.theme.veil） -->
+      <div class="absolute inset-0" style={veilStyle(theme.veil)} aria-hidden="true"></div>
+      <article class="relative w-[min(880px,calc(100vw-2rem))] p-[clamp(2rem,6vw,4.6rem)]">
+        <div>
+          <h1 class="mt-4 text-4xl uppercase tracking-[0.5em] sm:text-5xl">{pageTitle}</h1>
+        </div>
+        <div class="my-8 h-px bg-[rgba(226,222,255,0.3)]"></div>
+        <!-- flex + gap 保持段落间距；卡片类富文本会作为独立条目自然展开 -->
+        <div class="flex flex-col gap-6 text-lg leading-loose tracking-[0.08em] text-white/85 md-rich">
+          <Content />
+        </div>
+      </article>
+    </div>
+  </ListShell>
+</BaseLayout>

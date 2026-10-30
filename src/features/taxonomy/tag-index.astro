@@ -1,0 +1,31 @@
+---
+import { tagGroups } from '../post/taxonomy';
+import { assets, layout, routes, site, taxonomy } from '../../config';
+import ListShell from '../list/list-shell.astro';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+const groups = await tagGroups();
+---
+
+<BaseLayout title={`${site.name} | ${taxonomy.tagEyebrow}`}>
+  <ListShell bgImage={assets.layoutBackgrounds.tags} eyebrow={taxonomy.tagEyebrow}>
+    <div class="mx-auto max-w-6xl px-6 pb-24" style={{ paddingTop: layout.listTopPadding }}>
+      <div class="flex flex-wrap gap-3">
+        {
+          groups.map((group) => (
+            <a
+              class="group inline-flex items-baseline gap-1.5 rounded-xl bg-[rgba(15,12,34,0.25)] px-5 py-2.5 transition-colors hover:bg-[rgba(196,190,255,0.12)]"
+              href={`${routes.tags}/${encodeURIComponent(group.name)}`}
+            >
+              <span class="text-[1.02rem] tracking-[0.15em]">{group.name}</span>
+              <span class="text-[0.7rem] tracking-[0.2em] text-white/45 group-hover:text-white/75">
+                {group.count}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </ListShell>
+</BaseLayout>

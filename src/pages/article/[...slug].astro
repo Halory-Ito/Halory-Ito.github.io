@@ -1,0 +1,16 @@
+---
+import ArticleView from '../../features/article/article-view.astro';
+import { sortedPosts } from '../../features/post/lib';
+
+export async function getStaticPaths() {
+  const posts = await sortedPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, prev: posts[i + 1] ?? null, next: posts[i - 1] ?? null }
+  }));
+}
+
+const { post, prev, next } = Astro.props;
+---
+
+<ArticleView post={post} prev={prev} next={next} />

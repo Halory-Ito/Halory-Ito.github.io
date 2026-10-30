@@ -1,0 +1,41 @@
+---
+import { navLinks, site } from '../../config';
+
+interface Props {
+  /** 页面眉标（列表页显示页面身份；Layout 级 Header 不传） */
+  eyebrow?: string;
+  /** 可选的右侧附加文案（如过滤页的当前分类/标签名），提供时替代导航链接 */
+  aside?: string;
+}
+
+const { eyebrow, aside } = Astro.props;
+---
+
+<div class="relative mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-5">
+  <div class="flex min-w-0 items-center gap-5">
+    <a
+      class="block transition-colors text-sm tracking-[0.55em] text-white/85 uppercase hover:text-white"
+      href="/"
+    >
+      {site.name}
+    </a>
+    <span class="h-4 w-px shrink-0 bg-[rgba(226,222,255,0.25)]"></span>
+    <p class="truncate text-xs uppercase tracking-[0.8em] text-white/50">{eyebrow}</p>
+  </div>
+
+  {
+    aside ? (
+      <p class="truncate text-xs uppercase tracking-[0.4em] text-white/40" aria-label={eyebrow}>
+        {aside}
+      </p>
+    ) : (
+      <nav class="flex items-center gap-5 text-xs uppercase tracking-[0.4em] text-white/60">
+        {navLinks.map((link) => (
+          <a class="transition-colors hover:text-white" href={link.href}>
+            {link.label}
+          </a>
+        ))}
+      </nav>
+    )
+  }
+</div>

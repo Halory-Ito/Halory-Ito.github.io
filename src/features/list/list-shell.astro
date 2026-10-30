@@ -1,0 +1,32 @@
+---
+import { theme } from '../../config';
+import { maskAttrs, maskStyle } from '../theme/mask-style';
+import { Image } from 'astro:assets';
+
+/**
+ * 列表/文章页共用的背景外壳。
+ * Header/Footer 已上移至 Layout 公共 chrome（site-header/site-footer，含自动隐藏）。
+ */
+interface Props {
+  bgImage: string;
+  eyebrow: string;
+}
+
+const { bgImage, eyebrow } = Astro.props;
+---
+
+<div class="relative min-h-dvh bg-[#15122d]">
+  <div class="fixed inset-0">
+    <Image
+      src={bgImage}
+      alt={`${eyebrow} 背景`}
+      width={theme.imageDefaults.background.width}
+      height={theme.imageDefaults.background.height}
+      class="h-full w-full object-cover"
+    />
+    <div class="absolute inset-0" {...maskAttrs('page')} style={maskStyle(theme.masks.page)}></div>
+  </div>
+  <div class="relative z-10">
+    <slot />
+  </div>
+</div>

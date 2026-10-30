@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VNBlog | 阅读记录</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.13/dist/index.global.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
+    body { font-family: 'Cormorant Garamond', 'FangSong', '仿宋', serif; color: #f8f7ff; background-image: url('../public/images/cg/ev1013a.png'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100dvh; line-height: 2; }
+    body::before { content: ''; position: fixed; inset: 0; background-color: rgba(21, 18, 45, 0.6); pointer-events: none; z-index: 0; }
+    header, main, footer { position: relative; z-index: 1; }
+    .log-item { padding: 0.8rem 1.1rem; margin-bottom: 0.55rem; border-left: 2px solid rgba(226, 222, 255, 0.35); border-radius: 0 8px 8px 0; }
+    .log-item p { font-size: 1.02rem; letter-spacing: 0.06em; color: rgba(248, 247, 255, 0.9); }
+  </style>
+</head>
+<body>
+  <header class="relative border-b border-white/10">
+    <div class="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-6 px-6 py-8">
+      <div>
+        <p class="text-xs uppercase tracking-[0.8em] text-white/50">LOG</p>
+        <h1 class="mt-2 text-3xl sm:text-4xl tracking-[0.5em] uppercase">阅读记录</h1>
+        <p class="mt-2 text-sm tracking-[0.4em] uppercase text-white/50">文章：入夜的车站</p>
+      </div>
+      <nav class="flex items-center gap-6 text-xs uppercase tracking-[0.4em] text-white/60">
+        <a class="transition hover:text-white" href="scene.html">ADV</a>
+        <a class="transition hover:text-white" href="article.html">ARTICLE</a>
+        <a class="transition hover:text-white" href="index.html">TITLE</a>
+        <a class="transition hover:text-white" href="archive.html">ARCHIVE</a>
+      </nav>
+    </div>
+  </header>
+  <main class="mx-auto max-w-4xl px-6 py-10">
+    <div class="log-list">
+      <article class="log-item"><p>已经快到末班电车的时间了。车站的灯把细雨照成一片亮银色，铁轨尽头传来风声，却迟迟等不来进站前的提示音。</p></article>
+      <article class="log-item"><p>我站在月台的老位置，把手拢进外套口袋，看雨水顺着遮雨棚的边缘连成一条线。</p></article>
+      <article class="log-item"><p>约定的时间已经过了五分钟。手机在口袋里安安静静，月台上只剩我一个人，连自动售货机的灯光都比平时显得亮一些。</p></article>
+      <article class="log-item"><p>脚步声是从车站外面的坡道上传来的。由远及近，节奏有些乱，像是小跑，又像是在忍着不跑。</p></article>
+      <article class="log-item"><p>等到那个身影冲进遮雨棚的范围，头发上还挂着水珠，我才发现自己也悄悄松了口气。</p></article>
+      <article class="log-item"><p>借口一如既往地离谱，语气却理直气壮。我想了想，把已经到嘴边的责备咽了回去，只说了句「下不为例」。</p></article>
+      <article class="log-item"><p>列车进站的警报声响起时，雨小了一些。我们并排站在安全线后面，谁也没有先开口。</p></article>
+      <article class="log-item"><p>有些夜晚注定普通，普通到不值得被记住。但正因为普通，才会在很多年以后的某个雨天，被毫无预兆地想起——比如现在。</p></article>
+    </div>
+  </main>
+  <footer class="border-t border-white/10 py-8 text-center text-xs uppercase tracking-[0.4em] text-white/40">VNBlog Prototype · Reading Log</footer>
+</body>
+</html>

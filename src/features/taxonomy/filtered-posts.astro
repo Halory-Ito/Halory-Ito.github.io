@@ -1,0 +1,35 @@
+---
+import { assets, routes, site, taxonomy } from '../../config';
+import ListShell from '../list/list-shell.astro';
+import PostRows from '../post/post-rows.astro';
+import type { PostEntry } from '../post/lib';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+interface Props {
+  /** 'category' 或 'tag'，决定眉标与过滤语义 */
+  kind: 'category' | 'tag';
+  singular: string;
+  eyebrow: string;
+  /** 当前分类/标签名 */
+  value: string;
+  posts: PostEntry[];
+}
+
+const { kind, singular, eyebrow, value, posts } = Astro.props;
+const bgImage = kind === 'category' ? assets.layoutBackgrounds.categories : assets.layoutBackgrounds.tags;
+const items = posts.map((post) => ({
+  date: post.data.pubDate.toISOString().slice(0, 10),
+  title: post.data.title,
+  tags: post.data.tags.join(' · '),
+  href: `${routes.read}${post.id}`
+}));
+---
+
+<BaseLayout title={`${site.name} | ${singular} · ${value}`}>
+  <ListShell bgImage={bgImage} eyebrow={eyebrow}>
+    <div>
+      <PostRows items={items} heading={{ value, count: posts.length, unit: taxonomy.unitArticle }} />
+    </div>
+  </ListShell>
+</BaseLayout>

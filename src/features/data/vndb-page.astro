@@ -1,0 +1,34 @@
+---
+import { assets, layout, site, vndb } from '../../config';
+import ListShell from '../list/list-shell.astro';
+import VndbList from './vndb-list';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+/** VNDB 游玩记录（Extra 内嵌数据页）；数据为客户端岛屿实时拉取公共 API
+ * 页脚“前往 VNDB”按钮仅在未配置 userId 时作为引导显示 */
+const showFooterLink = !vndb.userId;
+---
+
+<BaseLayout title={`${site.name} | VNDB`}>
+  <ListShell bgImage={assets.layoutBackgrounds.vndb} eyebrow={vndb.eyebrow}>
+    <div class="mx-auto max-w-6xl px-6 pb-24" style={{ paddingTop: layout.listTopPadding }}>
+      <div class="mb-2">
+        <p class="text-3xl break-all tracking-[0.3em]">{vndb.title}</p>
+      </div>
+      <VndbList client:load />
+      {showFooterLink && (
+        <div class="mt-12 flex justify-end">
+          <a
+            class="inline-flex items-center gap-2 rounded-lg bg-[rgba(15,12,34,0.6)] px-5 py-2.5 text-[0.7rem] tracking-[0.3em] text-white/70 uppercase transition-colors hover:bg-[rgba(196,190,255,0.16)] hover:text-white"
+            href={vndb.homeUrl}
+            target="_blank"
+            rel="noopener"
+          >
+            <span>{vndb.footerLabel}</span>
+          </a>
+        </div>
+      )}
+    </div>
+  </ListShell>
+</BaseLayout>

@@ -1,0 +1,18 @@
+---
+import { categoryGroups } from '../../features/post/taxonomy';
+import { taxonomy } from '../../config';
+import FilteredPosts from '../../features/taxonomy/filtered-posts.astro';
+
+export async function getStaticPaths() {
+  const groups = await categoryGroups();
+  return groups.map((group) => ({
+    params: { name: group.name },
+    props: { kind: 'category' as const, posts: group.posts }
+  }));
+}
+
+const { kind, posts } = Astro.props;
+const { name } = Astro.params;
+---
+
+<FilteredPosts kind={kind} singular={taxonomy.categoryEyebrowSingular} eyebrow={taxonomy.categoryEyebrowSingular} value={name || ''} posts={posts} />

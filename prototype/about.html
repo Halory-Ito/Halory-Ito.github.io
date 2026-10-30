@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VNBlog | 关于</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.13/dist/index.global.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
+    body { font-family: 'Cormorant Garamond', 'FangSong', '仿宋', serif; color: #f8f7ff; overflow: hidden; }
+    .bg-layer::after { content: ''; position: absolute; inset: 0; background-color: rgba(9, 7, 24, 0.45); }
+    .panel { position: relative; width: min(880px, calc(100vw - 2rem)); border-radius: 18px; background-color: rgba(24, 20, 60, 0.4); border: 1px solid rgba(226, 222, 255, 0.25); box-shadow: 0 40px 80px -60px rgba(24, 20, 60, 0.9); overflow: hidden; }
+    .panel::before { content: ''; position: absolute; inset: 0; background-color: rgba(226, 222, 255, 0.04); pointer-events: none; }
+    .panel-inner { position: relative; display: flex; flex-direction: column; gap: 1.6rem; padding: clamp(2rem, 6vw, 4.6rem); }
+    .divider { height: 1px; background-color: rgba(226, 222, 255, 0.32); }
+  </style>
+</head>
+<body class="relative h-screen w-screen" style="background-color: #15122d;">
+  <div class="bg-layer absolute inset-0">
+    <img src="../public/images/cg/ev4005.png" alt="黄昏场景" class="h-full w-full object-cover">
+  </div>
+  <div class="absolute inset-0" style="background-color: rgba(9, 7, 24, 0.2);"></div>
+
+  <header class="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 py-8 sm:px-10">
+    <div class="text-xs uppercase tracking-[0.6em] text-white/50">ABOUT</div>
+    <nav class="flex items-center gap-6 text-xs uppercase tracking-[0.4em] text-white/60">
+      <a class="transition hover:text-white" href="index.html">TITLE</a>
+      <a class="transition hover:text-white" href="archive.html">ARCHIVE</a>
+      <a class="transition hover:text-white" href="article.html">SCENE</a>
+    </nav>
+  </header>
+
+  <main class="relative z-10 flex h-full items-center justify-center px-4">
+    <article class="panel">
+      <div class="panel-inner">
+        <div>
+          <p class="text-xs uppercase tracking-[0.8em] text-white/50">VISUAL NOVEL BLOG</p>
+          <h1 class="mt-4 text-4xl sm:text-5xl tracking-[0.5em] uppercase">VNBlog</h1>
+        </div>
+        <div class="divider"></div>
+        <div class="flex flex-col gap-6 text-lg leading-loose tracking-[0.08em] text-white/85">
+          <p>VNBlog 是一个尝试将「阅读」重新还原为「推演」的博客原型。每一篇文章都不止是列表中的一行标题，而是一幕只属于那篇文章的场景。</p>
+          <p>背景、光线、沉默、只言片语。比起信息密度更偏向氛围，用最克制的界面去留住阅读的节奏。</p>
+          <p class="text-white/60">本原型仅用于设计验证：交互以线性阅读为主，未来会迁移至 Astro + React，并结合 Content Collections 实现真正的内容驱动。</p>
+        </div>
+        <div class="divider"></div>
+        <div class="flex flex-wrap items-center justify-between gap-6 text-xs uppercase tracking-[0.4em] text-white/50">
+          <span>DESIGN PROTOTYPE · 2026</span>
+          <a class="transition hover:text-white" href="scene.html">TRY THE FIRST SCENE →</a>
+        </div>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

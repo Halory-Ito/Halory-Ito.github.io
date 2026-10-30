@@ -1,0 +1,67 @@
+---
+import { titleMenu, assets, routes, site, theme } from "../../config";
+import { sortedPosts } from "../post/lib";
+import { maskAttrs, maskStyle } from "../theme/mask-style";
+import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/base-layout.astro";
+import FooterInfo from "../layout/footer-info.astro";
+import "../../styles/global.css";
+
+const posts = await sortedPosts();
+const latest = posts[0];
+
+/** START 项的 href 在配置里是 'start' 哨兵值，这里解析为最新文章的阅读地址 */
+const menuHref = (href: string) =>
+  href === "start" ? `${routes.read}${latest.id}` : href;
+---
+
+<BaseLayout title={`${site.name} | ${site.description}`} showHeader={false} showFooter={false}>
+  <div class="relative h-screen w-screen bg-[#15122d]">
+    <div class="absolute inset-0">
+      <Image
+        src={assets.titleBackground}
+        alt="标题背景"
+        width={theme.imageDefaults.background.width}
+        height={theme.imageDefaults.background.height}
+        class="h-full w-full object-cover"
+      />
+      <div class="absolute inset-0" {...maskAttrs('title')} style={maskStyle(theme.masks.title)}></div>
+    </div>
+
+    <main
+      class="relative z-10 flex h-full flex-col items-center justify-center text-center"
+    >
+      <div class="opacity-0 [animation:vn-fade-in_900ms_ease_forwards]">
+        <!-- <p class="mb-4 text-xs uppercase tracking-[1.2em] text-white/60">VISUAL NOVEL STYLE BLOG</p> -->
+        <h1 class="text-6xl tracking-[0.8em] uppercase sm:text-7xl lg:text-8xl">
+          {site.name}
+        </h1>
+        <p class="mt-6 text-sm uppercase tracking-[0.6em] text-white/70">
+          {site.description}
+        </p>
+      </div>
+      <nav
+        class="mt-16 flex flex-col items-center gap-6 text-sm opacity-0 [animation:vn-fade-in_900ms_ease_280ms_forwards]"
+      >
+        {
+          titleMenu.map((item) => (
+            <a
+              class="group relative flex items-center gap-3 px-2 py-1 uppercase tracking-[0.6em] transition-all hover:tracking-[0.8em] hover:text-white"
+              href={menuHref(item.href)}
+            >
+              <span class="h-px flex-1 scale-x-[0.4] bg-[rgba(245,243,255,0.6)] opacity-0 transition-all duration-200 group-hover:scale-x-100 group-hover:opacity-100" />
+              <span>{item.label}</span>
+              <span class="h-px flex-1 scale-x-[0.4] bg-[rgba(245,243,255,0.6)] opacity-0 transition-all duration-200 group-hover:scale-x-100 group-hover:opacity-100" />
+            </a>
+          ))
+        }
+      </nav>
+    </main>
+
+    <footer
+      class="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-xs uppercase tracking-[0.35em] text-white/40"
+    >
+      <FooterInfo />
+    </footer>
+  </div>
+</BaseLayout>

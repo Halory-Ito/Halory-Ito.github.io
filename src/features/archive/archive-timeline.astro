@@ -1,0 +1,21 @@
+---
+import { sortedPosts } from '../post/lib';
+import PostRows from '../post/post-rows.astro';
+import { assets, routes, site } from '../../config';
+import ListShell from '../list/list-shell.astro';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+const items = (await sortedPosts()).map((post) => ({
+  date: post.data.pubDate.toISOString().slice(0, 10),
+  title: post.data.title,
+  tags: post.data.tags.join(' · '),
+  href: `${routes.read}${post.id}`
+}));
+---
+
+<BaseLayout title={`${site.name} | ARCHIVE`}>
+  <ListShell bgImage={assets.layoutBackgrounds.archive} eyebrow="ARCHIVE">
+    <PostRows items={items} />
+  </ListShell>
+</BaseLayout>

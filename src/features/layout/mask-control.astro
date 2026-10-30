@@ -1,0 +1,216 @@
+---
+import { SlidersHorizontal } from 'lucide-react';
+import { maskControl } from '../../config';
+
+/**
+ * 全局蒙层调节：右下角悬浮按钮 + 透明度/模糊滑杆。
+ * 滑杆值保存后，调用 BaseLayout 内联脚本暴露的 render 重新生成
+ * [data-vn-mask] 覆盖规则；所有带标记的蒙层即时生效。偏好持久化，
+ * 阅读页封面有独立的 BG 面板，本控件不覆盖它。
+ */
+const { labels } = maskControl;
+const opacityText = `${Math.round(maskControl.defaults.opacity * 100)}%`;
+const blurText = `${maskControl.defaults.blur}px`;
+---
+
+<div data-mask-control class="fixed right-4 bottom-20 z-[60] sm:right-6">
+  <button
+    type="button"
+    data-mask-toggle
+    aria-expanded="false"
+    aria-controls="global-mask-panel"
+    aria-label={labels.open}
+    class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[rgba(15,12,34,0.82)] text-white/70 shadow-[0_10px_28px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-colors hover:bg-[rgba(196,190,255,0.22)] hover:text-white"
+  >
+    <SlidersHorizontal className="h-5 w-5" strokeWidth={1.5} />
+  </button>
+
+  <section
+    id="global-mask-panel"
+    data-mask-panel
+    role="dialog"
+    aria-label={labels.title}
+    hidden
+    class="absolute right-0 bottom-full mb-3 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-[rgba(15,12,34,0.92)] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+  >
+    <header class="mb-5 flex items-center justify-between">
+      <p class="text-[0.72rem] tracking-[0.4em] text-white/70 uppercase">{labels.title}</p>
+      <button
+        type="button"
+        data-mask-reset
+        class="cursor-pointer rounded-md px-2 py-1 text-[0.65rem] tracking-[0.25em] text-white/45 uppercase transition-colors hover:bg-[rgba(196,190,255,0.14)] hover:text-white/80"
+      >
+        {labels.reset}
+      </button>
+    </header>
+
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between text-[0.72rem] tracking-[0.25em] text-white/55">
+        <label for="global-mask-opacity">{labels.opacity}</label>
+        <output data-mask-output="opacity" class="text-white/80 tabular-nums">{opacityText}</output>
+      </div>
+      <input
+        id="global-mask-opacity"
+        data-mask-range="opacity"
+        type="range"
+        min={maskControl.opacityMin}
+        max={maskControl.opacityMax}
+        step={maskControl.opacityStep}
+        value={maskControl.defaults.opacity}
+        class="h-1.5 w-full cursor-pointer accent-[#c4beff]"
+      />
+    </div>
+
+    <div class="mt-5 flex flex-col gap-2">
+      <div class="flex items-center justify-between text-[0.72rem] tracking-[0.25em] text-white/55">
+        <label for="global-mask-blur">{labels.blur}</label>
+        <output data-mask-output="blur" class="text-white/80 tabular-nums">{blurText}</output>
+      </div>
+      <input
+        id="global-mask-blur"
+        data-mask-range="blur"
+        type="range"
+        min={maskControl.blurMin}
+        max={maskControl.blurMax}
+        step={maskControl.blurStep}
+        value={maskControl.defaults.blur}
+        class="h-1.5 w-full cursor-pointer accent-[#c4beff]"
+      />
+    </div>
+  </section>
+</div>
+
+<script>
+  import { maskControl } from '../../config';
+
+  /**
+   * 全局蒙层调节的客户端逻辑：
+   * - 滑杆值保存到 localStorage，并调用 BaseLayout 内联脚本暴露的 render
+   *   重新生成 [data-vn-mask] 覆盖规则，所有蒙层实时变化；
+   * - 偏好保存在 localStorage，跨页面（含 View Transitions）保持；
+   * - 事件委托挂在 document 上，脚本只注册一次，导航后依然有效。
+   */
+  interface MaskPrefs {
+    opacity: number;
+    blur: number;
+  }
+
+  const STORAGE_KEY = maskControl.storageKey;
+  const DEFAULTS: MaskPrefs = { opacity: maskControl.defaults.opacity, blur: maskControl.defaults.blur };
+
+  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+  /** 归一化并夹取到滑杆范围内，防止手改 localStorage 越界 */
+  const sanitize = (value: Partial<MaskPrefs>): MaskPrefs => ({
+    opacity: clamp(Number(value.opacity ?? DEFAULTS.opacity), maskControl.opacityMin, maskControl.opacityMax),
+    blur: clamp(Number(value.blur ?? DEFAULTS.blur), maskControl.blurMin, maskControl.blurMax)
+  });
+
+  const readStored = (): MaskPrefs | null => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      return raw ? sanitize(JSON.parse(raw)) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  /** 偏好为 null / 清除后，覆盖规则清空，回到各蒙层自身的配置值 */
+  const syncMaskStyles = () => {
+    const host = window as typeof window & { __vnblogMaskStyles?: (doc?: Document) => void };
+    host.__vnblogMaskStyles?.();
+  };
+
+  const save = (prefs: MaskPrefs) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    } catch {
+      /* 隐私模式等不可写入时忽略，仅本次会话生效 */
+    }
+  };
+
+  let prefs: MaskPrefs = DEFAULTS;
+
+  const panel = () => document.querySelector<HTMLElement>('[data-mask-panel]');
+  const toggle = () => document.querySelector<HTMLElement>('[data-mask-toggle]');
+
+  const setOpen = (open: boolean) => {
+    panel()?.toggleAttribute('hidden', !open);
+    toggle()?.setAttribute('aria-expanded', String(open));
+  };
+
+  /** 把 prefs 同步到当前页面的滑杆与数值文本 */
+  const syncWidgets = () => {
+    const container = document.querySelector('[data-mask-control]');
+    if (!container) return;
+    for (const input of container.querySelectorAll<HTMLInputElement>('[data-mask-range]')) {
+      const field = input.dataset.maskRange;
+      if (field === 'opacity' || field === 'blur') input.value = String(prefs[field]);
+    }
+    for (const output of container.querySelectorAll<HTMLElement>('[data-mask-output]')) {
+      const field = output.dataset.maskOutput;
+      if (field === 'opacity') output.textContent = `${Math.round(prefs.opacity * 100)}%`;
+      if (field === 'blur') output.textContent = `${prefs.blur}px`;
+    }
+  };
+
+  /** 首次渲染与每次 View Transition 后：同步面板状态（样式已由内联脚本处理） */
+  const init = () => {
+    const stored = readStored();
+    prefs = stored ?? DEFAULTS;
+    syncMaskStyles();
+    syncWidgets();
+    setOpen(false);
+  };
+
+  init();
+
+  const win = window as typeof window & { __vnblogMaskControl?: boolean };
+  if (!win.__vnblogMaskControl) {
+    win.__vnblogMaskControl = true;
+
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest('[data-mask-toggle]')) {
+        setOpen(Boolean(panel()?.hasAttribute('hidden')));
+        return;
+      }
+      if (target.closest('[data-mask-reset]')) {
+        prefs = DEFAULTS;
+        try {
+          window.localStorage.removeItem(STORAGE_KEY);
+        } catch {
+          /* 忽略 */
+        }
+        syncMaskStyles();
+        syncWidgets();
+        return;
+      }
+      if (!target.closest('[data-mask-control]')) setOpen(false);
+    });
+
+    document.addEventListener('input', (event) => {
+      const input = event.target as HTMLInputElement | null;
+      const field = input?.dataset.maskRange;
+      if (!input || (field !== 'opacity' && field !== 'blur')) return;
+      prefs = sanitize(
+        field === 'opacity' ? { ...prefs, opacity: Number(input.value) } : { ...prefs, blur: Number(input.value) }
+      );
+      save(prefs);
+      syncMaskStyles();
+      syncWidgets();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+
+    /* before-swap 已由 BaseLayout 的内联脚本把覆盖规则写进新文档；这里再兜底一次 */
+    document.addEventListener('astro:after-swap', () => {
+      syncMaskStyles();
+    });
+
+    document.addEventListener('astro:page-load', init);
+  }
+</script>

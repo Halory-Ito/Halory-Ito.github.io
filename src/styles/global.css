@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", "FangSong", "仿宋", serif;
+  --color-night-950: #15122d;
+  --color-night-900: #15122d;
+  --color-night-base: #120f2a;
+  --color-noon: #f5f3ff;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-serif);
+  background-color: #15122d;
+  color: #f5f3ff;
+  text-autospace: "normal";
+}
+
+/* 《原型》全屏阅读容器 */
+.reading-fullscreen {
+  position: relative;
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* 共用显隐过渡（侧栏/视图层的 opacity 与 translate 动效依赖此规则） */
+.vn-ui {
+  transition:
+    opacity 260ms ease,
+    translate 240ms ease;
+}
+
+/* 打字机光标 */
+.vn-caret {
+  display: inline-block;
+  width: 0.6rem;
+  height: 1.4rem;
+  margin-left: 0.4rem;
+  vertical-align: text-bottom;
+  background-color: rgb(248 247 255 / 0.9);
+  animation: vn-blink 900ms steps(2) infinite;
+}
+
+@keyframes vn-blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 继续指示箭头 */
+.vn-next-arrow {
+  display: inline-block;
+  animation: vn-float 1200ms ease-in-out infinite;
+}
+
+@keyframes vn-float {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+/* 标题界面入场 */
+@keyframes vn-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 列表页 header/footer 的自动隐藏过渡（translate 由 config.listLayout 控制开关） */
+.list-chrome {
+  transition:
+    translate 240ms ease,
+    opacity 240ms ease;
+}
+
+/* Markdown 富文本（remark/rehype 渲染结果，ADV/NVL/ARTICLE 三处共用） */
+.md-rich {
+  font-family: inherit;
+}
+.md-rich mark {
+  background-color: rgb(196 190 255 / 0.35);
+  color: #f5f3ff;
+  padding: 0 0.3em;
+  border-radius: 0.25em;
+}
+.md-rich code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background-color: rgb(226 222 255 / 0.12);
+  padding: 0.1em 0.4em;
+  border-radius: 0.3em;
+}
+.md-rich pre code {
+  padding: 0;
+  background: transparent;
+}
+.md-rich del {
+  opacity: 0.6;
+}
+.md-rich strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+.md-rich a {
+  color: #c4beff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.md-rich ul,
+.md-rich ol {
+  margin: 0.3em 0 0.3em 1.5em;
+  list-style: revert;
+}
+.md-rich li {
+  margin: 0.25em 0;
+}
+.md-rich blockquote {
+  margin: 0.5em 0;
+  padding-left: 1em;
+  background: rgb(226 222 255 / 0.06);
+  color: rgb(245 243 255 / 0.75);
+}
+.md-rich table {
+  border-collapse: collapse;
+}
+.md-rich th,
+.md-rich td {
+  padding: 0.4em 0.7em;
+}
+/* 无边框表格：以行底色区分行列关系 */
+.md-rich thead th {
+  background: rgb(226 222 255 / 0.12);
+}
+.md-rich tbody tr:nth-child(even) {
+  background: rgb(226 222 255 / 0.05);
+}
+.md-rich h1,
+.md-rich h2,
+.md-rich h3,
+.md-rich h4 {
+  color: #ffffff;
+  letter-spacing: 0.2em;
+  margin: 1em 0 0.5em;
+}
+
+/* ::github 仓库卡片（remark-github-card 生成；Astro <Content /> 与阅读器 rich HTML 共用） */
+.md-rich .github-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  max-width: 100%;
+  align-items: center;
+  width: fit-content;
+  margin: 0.75rem auto;
+  padding: 0.55rem 1rem;
+  border-radius: 0.9rem;
+  background: rgb(15 12 34 / 0.45);
+  text-decoration: none;
+  transition: background-color 200ms ease;
+}
+.md-rich .github-card:hover {
+  background: rgb(196 190 255 / 0.12);
+}
+.md-rich .github-card:focus-visible {
+  outline: 2px solid rgb(196 190 255 / 0.7);
+  outline-offset: 3px;
+}
+.md-rich .github-card-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: rgb(226 222 255 / 0.15);
+}
+.md-rich .github-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+}
+.md-rich .github-card-owner {
+  color: rgb(245 243 255 / 0.6);
+}
+.md-rich .github-card-sep {
+  color: rgb(245 243 255 / 0.35);
+}
+.md-rich .github-card-repo {
+  color: rgb(245 243 255 / 0.95);
+  font-weight: 600;
+}
+/* 自绘徽章 chip：图标 + 数值（与站内数据页 chip 同款视觉语言）；当前值来源为构建时拉取 */
+.md-rich .github-card-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.md-rich .github-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 0.5rem;
+  background: rgb(196 190 255 / 0.14);
+  color: rgb(196 190 255);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  transition: background-color 200ms ease;
+}
+.md-rich .github-card:hover .github-card-badge {
+  background: rgb(196 190 255 / 0.22);
+}
+.md-rich .github-card-badge-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  flex-shrink: 0;
+}
+.md-rich .github-card-badge-value {
+  font-variant-numeric: tabular-nums;
+}
+.md-rich .github-card-badge.is-missing .github-card-badge-value {
+  color: rgb(245 243 255 / 0.4);
+}

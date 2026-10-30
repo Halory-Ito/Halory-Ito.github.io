@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VNBlog | EXTRA</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.13/dist/index.global.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
+    body { font-family: 'Cormorant Garamond', 'FangSong', '仿宋', serif; color: #f8f7ff; background-image: url('../public/images/cg/ev5015.png'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100dvh; line-height: 1.9; }
+    body::before { content: ''; position: fixed; inset: 0; background-color: rgba(21, 18, 45, 0.6); pointer-events: none; z-index: 0; }
+    header, main, footer { position: relative; z-index: 1; }
+    header::after { content: ''; position: absolute; inset: auto 0 0 0; height: 1px; background-color: rgba(226, 222, 255, 0.3); }
+
+    .section-title { display: flex; align-items: baseline; gap: 1rem; margin: 3rem 0 1.2rem 0; }
+    .section-title h2 { font-size: 1.6rem; letter-spacing: 0.4em; }
+    .section-title span { font-size: 0.7rem; letter-spacing: 0.5em; text-transform: uppercase; color: rgba(248, 247, 255, 0.45); }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.9rem; }
+    .link-card { display: flex; flex-direction: column; gap: 0.4rem; padding: 1rem 1.15rem; border-radius: 12px; border: 1px solid rgba(226, 222, 255, 0.2); background-color: rgba(15, 12, 34, 0.25); transition: all 200ms ease; }
+    .link-card:hover { border-color: rgba(226, 222, 255, 0.5); background-color: rgba(196, 190, 255, 0.1); }
+    .card-head { display: flex; align-items: center; justify-content: space-between; }
+    .card-name { font-size: 1.05rem; letter-spacing: 0.25em; }
+    .card-arrow { font-size: 0.85rem; color: rgba(248, 247, 255, 0.35); transition: color 200ms ease; }
+    .link-card:hover .card-arrow { color: rgba(248, 247, 255, 0.85); }
+    .card-desc { font-size: 0.85rem; letter-spacing: 0.08em; color: rgba(248, 247, 255, 0.55); line-height: 1.8; }
+  </style>
+</head>
+<body>
+  <header class="relative">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-8">
+      <p class="text-xs uppercase tracking-[0.8em] text-white/50">EXTRA</p>
+      <nav class="flex items-center gap-6 text-xs uppercase tracking-[0.4em] text-white/60">
+        <a class="transition hover:text-white" href="index.html">TITLE</a>
+        <a class="transition hover:text-white" href="archive.html">ARCHIVE</a>
+        <a class="transition hover:text-white" href="settings.html">SETTINGS</a>
+        <a class="transition hover:text-white" href="about.html">ABOUT</a>
+      </nav>
+    </div>
+  </header>
+  <main class="mx-auto max-w-6xl px-6 pb-24">
+    <p class="mt-4 max-w-3xl text-sm tracking-[0.1em] text-white/55">
+      自定义入口页：这里的内容由开发者自由配置，可按分组挂载任意外部站点或本地页面。
+    </p>
+
+    <section>
+      <div class="section-title">
+        <h2>娱乐</h2>
+        <span>Entertainment</span>
+      </div>
+      <div class="card-grid">
+        <a class="link-card" href="https://bgm.tv" target="_blank" rel="noopener">
+          <div class="card-head"><span class="card-name">Bangumi</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">动画、游戏、音乐的作品条目与收藏管理。</p>
+        </a>
+        <a class="link-card" href="https://vndb.org" target="_blank" rel="noopener">
+          <div class="card-head"><span class="card-name">VNDB</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">视觉小说数据库，作品评分与游玩记录。</p>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>学习</h2>
+        <span>Learning</span>
+      </div>
+      <div class="card-grid">
+        <a class="link-card" href="https://www.bilibili.com" target="_blank" rel="noopener">
+          <div class="card-head"><span class="card-name">Bilibili</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">技术视频教程与课程收藏。</p>
+        </a>
+        <a class="link-card" href="https://www.youtube.com" target="_blank" rel="noopener">
+          <div class="card-head"><span class="card-name">YouTube</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">会议演讲与长视频学习资料。</p>
+        </a>
+        <a class="link-card" href="https://www.csdn.net" target="_blank" rel="noopener">
+          <div class="card-head"><span class="card-name">CSDN</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">中文技术社区，问题检索与博客。</p>
+        </a>
+        <a class="link-card" href="https://developer.mozilla.org" target="_blank" rel="noopener">
+          <div class="card-head"><span class="card-name">MDN</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">Web 技术标准文档，前端查询手册。</p>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>友链</h2>
+        <span>Friends</span>
+      </div>
+      <div class="card-grid">
+        <a class="link-card" href="#">
+          <div class="card-head"><span class="card-name">示例博客</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">朋友的个人博客，补充开发者自定义的链接。</p>
+        </a>
+        <a class="link-card" href="#">
+          <div class="card-head"><span class="card-name">示例小站</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">友链卡片可自由增删，按需配置名称与描述。</p>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>留言板</h2>
+        <span>Guestbook</span>
+      </div>
+      <div class="card-grid">
+        <a class="link-card" href="#">
+          <div class="card-head"><span class="card-name">留言板</span><span class="card-arrow">↗</span></div>
+          <p class="card-desc">读者留言与互动，可指向本地页面或外部服务。</p>
+        </a>
+      </div>
+    </section>
+  </main>
+  <footer class="border-t border-white/10 py-8 text-center text-xs uppercase tracking-[0.4em] text-white/40">VNBlog Prototype · Extra</footer>
+</body>
+</html>

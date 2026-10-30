@@ -1,0 +1,57 @@
+---
+import { ArrowRight } from 'lucide-react';
+import { layout } from '../../config';
+
+/** 时间轴行条目（归档 / 分类 / 标签页共用） */
+export interface TimelineItem {
+  date: string;
+  title: string;
+  tags: string;
+  href: string;
+}
+
+interface Props {
+  items: TimelineItem[];
+  /** 可选的页面标题块（过滤页展示当前分类/标签） */
+  heading?: { value: string; count: number; unit?: string };
+}
+
+const { items, heading } = Astro.props;
+/** 顶部避让公共 Header 的内边距（config.layout.listTopPadding） */
+const topPad = layout.listTopPadding;
+---
+
+<div class="relative mx-auto max-w-6xl px-6 pb-24" style={{ paddingTop: topPad }}>
+  <span class="absolute bottom-24 left-12 w-px bg-[rgba(226,222,255,0.25)]" style={{ top: topPad }}></span>
+  {
+    heading && (
+      <div class="mb-12">
+        <p class="text-3xl break-all tracking-[0.2em]">{heading.value}</p>
+        <p class="mt-2 text-xs tracking-[0.4em] text-white/50">
+          {heading.count} {heading.unit ?? ''}
+        </p>
+      </div>
+    )
+  }
+  {
+    items.map((item) => (
+      <a
+        class="group grid grid-cols-[3rem_110px_minmax(0,1fr)_auto] items-center rounded-xl py-2.5 pr-4 transition-colors hover:bg-[rgba(196,190,255,0.1)]"
+        href={item.href}
+      >
+        <span class="relative">
+          <span class="absolute left-6 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(226,222,255,0.3)] transition-colors group-hover:bg-[rgba(226,222,255,0.9)]" />
+        </span>
+        <span class="whitespace-nowrap text-[0.8rem] tracking-[0.25em] text-white/50">{item.date}</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[1.05rem] tracking-[0.25em]">{item.title}</span>
+          <span class="block text-[0.68rem] uppercase tracking-[0.35em] text-white/45">{item.tags}</span>
+        </span>
+        <ArrowRight
+          className="h-5 w-5 shrink-0 text-white/35 transition-colors group-hover:text-white/85"
+          strokeWidth={1.5}
+        />
+      </a>
+    ))
+  }
+</div>

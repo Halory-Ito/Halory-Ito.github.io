@@ -1,0 +1,157 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import SiteHeader from '../features/layout/site-header.astro';
+import SiteFooter from '../features/layout/site-footer.astro';
+import MaskControl from '../features/layout/mask-control.astro';
+import { layout, maskControl, site, theme } from '../config';
+
+interface Props {
+  title?: string;
+  /** 标题界面 / 阅读场景有各自的 chrome，设为 false 关闭公共 Header/Footer */
+  showHeader?: boolean;
+  showFooter?: boolean;
+  /** 全局蒙层悬浮按钮；标题界面与阅读页（有自己的 BG 面板）关闭 */
+  showMaskControl?: boolean;
+}
+
+const { title = site.name, showHeader = true, showFooter = true, showMaskControl = true } = Astro.props;
+const { autoHide, topTriggerPx, bottomHideZonePx, pageTransition: pt } = layout;
+/** 各类型蒙层的颜色：全局调节时按 data-vn-mask 类型 + 各自颜色生成覆盖规则 */
+const maskColors = {
+  page: theme.masks.page.color,
+  cover: theme.masks.cover.color,
+  title: theme.masks.title.color,
+  nvl: theme.masks.nvl.color
+};
+
+/**
+ * 页面级过渡动画描述（Astro View Transitions 的原始动画对象形式）：
+ * fade = 交叉淡出（与 Astro 内置根过渡相同 keyframes：plus-lighter 混合），
+ * slide = 旧页滑出 / 新页滑入，none 直接交给简写字符串。时长与缓动来自 config.layout.pageTransition。
+ */
+const stepsFor = () =>
+  pt.kind === 'fade'
+    ? {
+        old: { name: 'astroFadeOut', duration: pt.duration, easing: pt.easing, fillMode: 'both' },
+        new: { name: 'astroFadeIn', duration: pt.duration, easing: pt.easing, fillMode: 'both' }
+      }
+    : {
+        old: [
+          { name: 'astroFadeOut', duration: pt.duration, easing: pt.easing, fillMode: 'both' },
+          { name: 'astroSlideToLeft', duration: pt.duration, easing: pt.easing, fillMode: 'both' }
+        ],
+        new: [
+          { name: 'astroFadeIn', duration: pt.duration, easing: pt.easing, fillMode: 'both' },
+          { name: 'astroSlideFromRight', duration: pt.duration, easing: pt.easing, fillMode: 'both' }
+        ]
+      };
+const pageAnim =
+  pt.kind === 'none'
+    ? 'none'
+    : { forwards: stepsFor(), backwards: stepsFor() };
+import '../styles/global.css';
+---
+
+<html lang="zh-CN" transition:animate={pageAnim}>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={site.description} />
+    <title>{title}</title>
+    {
+      /* 蒙层偏好要在首帧之前生效：head 里的内联脚本把偏好编译成一条
+         [data-vn-mask="…"] 覆盖规则（颜色来自 config，透明度/模糊来自 localStorage），
+         body 解析时蒙层首帧即正确，不会先闪默认值。
+         View Transitions 会用新文档替换 head，因此 before-swap 阶段把同一份规则
+         写进新文档的 <style>，导航过程中也不会闪回默认值。 */
+    }
+    <style id="vn-mask-prefs" is:inline></style>
+    <script
+      is:inline
+      define:vars={{
+        maskKey: maskControl.storageKey,
+        maskColors
+      }}
+    >
+      (() => {
+        const STYLE_ID = 'vn-mask-prefs';
+        const readPrefs = () => {
+          try {
+            const raw = localStorage.getItem(maskKey);
+            return raw ? JSON.parse(raw) : null;
+          } catch {
+            return null;
+          }
+        };
+        const percent = (value) => `${Math.round(value * 10000) / 100}%`;
+        /** 每个类型一条规则，只命中带 data-vn-mask 的蒙层；!important 覆盖组件内联的基础值 */
+        const cssFor = (prefs) =>
+          Object.keys(maskColors)
+            .map(
+              (kind) =>
+                `[data-vn-mask="${kind}"]{background-color:color-mix(in srgb, ${maskColors[kind]} ${percent(prefs.opacity)}, transparent) !important;backdrop-filter:blur(${prefs.blur}px) !important;}`
+            )
+            .join('');
+        const render = (doc) => {
+          const style = (doc || document).getElementById(STYLE_ID);
+          if (!style) return;
+          const prefs = readPrefs();
+          style.textContent =
+            prefs && typeof prefs.opacity === 'number' && typeof prefs.blur === 'number' ? cssFor(prefs) : '';
+        };
+        /* 悬浮按钮改动偏好后调用同一个 render，避免两处生成逻辑不一致 */
+        window.__vnblogMaskStyles = render;
+        render();
+        document.addEventListener('astro:before-swap', (event) => render(event.newDocument));
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <ClientRouter />
+  </head>
+  <body
+    class="bg-night-950 text-noon"
+    data-top-trigger={String(topTriggerPx)}
+    data-bottom-zone={String(bottomHideZonePx)}
+  >
+    {showHeader && <SiteHeader />}
+    <slot />
+    {showFooter && <SiteFooter />}
+    {showMaskControl && <MaskControl />}
+
+    {
+      /* 鼠标移向屏幕边缘唤出公共 chrome；触发距离均来自 config.layout。
+         View Transitions 会替换 body 节点，因此监听器以“事件发生时实时查询 DOM”实现，
+         只需注册一次（window 级监听跨页面导航持续有效），并去重防止脚本重复执行时重复注册。 */
+      (showHeader || showFooter) && autoHide && (
+        <script>
+          (function () {
+            const win = window as typeof window & { __vnblogChromeMove?: (e: MouseEvent) => void };
+            const onMove = (e: MouseEvent) => {
+              const header = document.querySelector('[data-chrome="top"]');
+              const footer = document.querySelector('[data-chrome="bottom"]');
+              const topTrigger = Number(document.body.getAttribute('data-top-trigger')) || 64;
+              const bottomZone = Number(document.body.getAttribute('data-bottom-zone')) || 36;
+              if (header) {
+                header.classList.toggle('-translate-y-full', e.clientY > topTrigger);
+              }
+              if (footer) {
+                footer.classList.toggle('translate-y-full', e.clientY <= window.innerHeight - bottomZone);
+              }
+            };
+            if (win.__vnblogChromeMove) return;
+            win.__vnblogChromeMove = onMove;
+            window.addEventListener('mousemove', onMove);
+          })();
+        </script>
+      )
+    }
+  </body>
+</html>

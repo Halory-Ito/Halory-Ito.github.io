@@ -1,0 +1,17 @@
+---
+import { layout, theme } from '../../config';
+import FooterInfo from './footer-info.astro';
+
+/** Layout 级公共 Footer：版权/备案（文案见 footer-info 组件）；autoHide 配置控制是否常驻 */
+const { autoHide } = layout;
+---
+
+<footer
+  data-chrome="bottom"
+  class={`list-chrome z-50 py-5 text-center text-xs uppercase tracking-[0.4em] text-white/40 ${
+    autoHide ? 'fixed inset-x-0 bottom-0 translate-y-full' : 'sticky bottom-0'
+  }`}
+  style={{ backgroundColor: theme.topBar }}
+>
+  <FooterInfo />
+</footer>

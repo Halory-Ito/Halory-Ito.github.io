@@ -1,0 +1,38 @@
+---
+import { categoryGroups } from '../post/taxonomy';
+import { assets, layout, routes, site, taxonomy } from '../../config';
+import ListShell from '../list/list-shell.astro';
+import { ArrowRight } from 'lucide-react';
+import BaseLayout from '../../layouts/base-layout.astro';
+import '../../styles/global.css';
+
+const groups = await categoryGroups();
+---
+
+<BaseLayout title={`${site.name} | ${taxonomy.categoryEyebrow}`}>
+  <ListShell bgImage={assets.layoutBackgrounds.categories} eyebrow={taxonomy.categoryEyebrow}>
+    <div class="mx-auto max-w-6xl px-6 pb-24" style={{ paddingTop: layout.listTopPadding }}>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          groups.map((group) => (
+            <a
+              class="group flex items-center justify-between gap-4 rounded-xl bg-[rgba(15,12,34,0.25)] px-6 py-5 transition-colors hover:bg-[rgba(196,190,255,0.12)]"
+              href={`${routes.categories}/${encodeURIComponent(group.name)}`}
+            >
+              <span class="min-w-0">
+                <span class="block truncate text-lg tracking-[0.25em]">{group.name}</span>
+                <span class="mt-1 block text-[0.72rem] tracking-[0.35em] text-white/45">
+                  {group.count} {taxonomy.unitArticle}
+                </span>
+              </span>
+              <ArrowRight
+                className="h-4 w-4 shrink-0 text-white/35 transition-colors group-hover:text-white/85"
+                strokeWidth={1.5}
+              />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </ListShell>
+</BaseLayout>

@@ -1,0 +1,15 @@
+---
+import { site } from '../../config';
+
+/**
+ * 全站页脚的版权/备案信息（Layout 公共 Footer 与标题界面 Footer 共用）。
+ * 这些是页面装饰性信息，直接写在组件内，不再经过 config。
+ */
+const copyrightYear = 2026;
+const poweredBy = 'Powered by Astro & React';
+const beian = { label: '京ICP备20260101号-1', url: 'https://beian.miit.gov.cn' };
+---
+
+<span>© {copyrightYear} {site.name} · {poweredBy}</span>
+<span class="mx-2 text-white/20">|</span>
+<a class="transition-colors hover:text-white/70" href={beian.url}>{beian.label}</a>
